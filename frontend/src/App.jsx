@@ -5,11 +5,11 @@ import DownloadPDFReport from "./components/DownloadPDFReport";
 import WelcomeScreen from "./components/WelcomeScreen";
 import ConfirmModal from "./components/ConfirmModal";
 
-import ogdclLogo from "../public/ogdcl_logo_hd.png";
+import ogdclLogo from "../public/ogdcl_logo_hd.svg";
 
 const drawConfigs = {
-  hajj: { winners: 57, waiting: 25, drawYear: 2025, drawNumber: 40 },
-  umrah: { winners: 12, waiting: 8, drawYear: 2025, drawNumber: 12 },
+  hajj: { winners: 57, waiting: 25, drawYear: 2026, drawNumber: 41 },
+  umrah: { winners: 12, waiting: 8, drawYear: 2026, drawNumber: 13 },
 };
 
 function App() {
@@ -68,12 +68,13 @@ function App() {
   return (
     <div className="flex flex-col min-h-screen bg-blue-50 dark:bg-gradient-to-br dark:from-black dark:via-gray-800 dark:to-black text-black dark:text-white transition-colors duration-300 print:bg-white print:text-black">
       <main className="flex-grow p-8 flex flex-col items-center justify-start">
-        <div className="w-full flex flex-row justify-center items-center mb-12 print:mb-4 space-x-4">
-          <img
+                  <img
             src={ogdclLogo}
             alt="OGDCL Logo"
-            className="w-30 h-30 mb-6 print:mb-2"
+            className="w-96  mb-6 print:mb-2"
           />
+        <div className="w-full flex flex-row justify-center items-center mb-12 print:mb-4 space-x-4">
+
           <h1 className="text-7xl font-extrabold mb-4 print:text-3xl drop-shadow-lg text-center">
             Hajj & Umrah Lucky Draw
           </h1>
