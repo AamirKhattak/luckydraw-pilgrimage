@@ -7,7 +7,7 @@ function toSentenceCase(str) {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
-const DownloadPDFReport = ({ results, drawType, drawNumber, buttonLabel, className = "bg-green-700 text-white font-semibold px-6 py-2 rounded shadow-md mb-6 hover:cursor-pointer hover:bg-green-800 transition-colors duration-300 print:hidden" }) => {
+const DownloadPDFReport = ({ results, drawType, drawNumber, buttonLabel, className = "inline-flex items-center justify-center gap-2 rounded-2xl border border-emerald-600 bg-emerald-700 px-8 py-3.5 text-base font-semibold text-white shadow-[0_16px_40px_rgba(5,150,105,0.25)] transition hover:-translate-y-0.5 hover:bg-emerald-800 focus:outline-none focus:ring-4 focus:ring-emerald-300 print:hidden md:text-lg lg:px-9 lg:py-4" }) => {
   const drawLabel = toSentenceCase(drawType) || "PILGRIMAGE";
 
   const today = new Date().toLocaleDateString("en-US", {
@@ -222,8 +222,10 @@ const DownloadPDFReport = ({ results, drawType, drawNumber, buttonLabel, classNa
     <button
       onClick={generatePDF}
       className={`${className} print:hidden`}
+      aria-label={buttonLabel || `Download ${drawLabel} Draw Results`}
     >
-      {buttonLabel || `📄 Download ${drawLabel} Draw Report`}
+      {/* <span className="text-lg">⬇️</span> */}
+      <span>{buttonLabel || `Download ${drawLabel} Draw Results`}</span>
     </button>
   );
 };

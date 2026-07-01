@@ -100,7 +100,7 @@ function App() {
 
         {screen === "selection" && (
           <>
-            <div className="space-x-6 mb-12">
+            <div className="mb-12 flex flex-col gap-4 md:flex-row md:justify-center">
               {Object.keys(drawConfigs).map((type) => {
                 const isCompleted = completedDraws.includes(type);
                 return (
@@ -115,10 +115,10 @@ function App() {
                       }
                     }}
                     disabled={isCompleted}
-                    className={`text-white font-bold text-xl px-8 py-4 rounded shadow-xl transition-colors duration-300 print:hidden ${
+                    className={`inline-flex items-center justify-center rounded-[24px] border px-8 py-4 text-lg font-semibold shadow-[0_16px_40px_rgba(15,23,42,0.14)] transition-all duration-300 print:hidden md:text-xl ${
                       isCompleted
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-black dark:bg-white dark:text-black hover:bg-yellow-600 dark:hover:bg-yellow-600"
+                        ? "cursor-not-allowed border-slate-300 bg-slate-200 text-slate-500"
+                        : "border-emerald-600 bg-emerald-700 text-white hover:-translate-y-1 hover:bg-emerald-800 hover:shadow-[0_20px_50px_rgba(5,150,105,0.25)] dark:border-emerald-500 dark:bg-emerald-600 dark:hover:bg-emerald-500"
                     }`}
                   >
                     {isCompleted
@@ -158,24 +158,37 @@ function App() {
         )}
 
         {screen === "results" && results.length > 0 && (
-          <>
-            <DownloadPDFReport
-              results={results}
-              drawType={drawType}
-              drawNumber={drawConfigs[drawType].drawNumber}
-            />
+          <div className="w-full max-w-7xl">
+            <div className="mb-6 flex flex-col gap-4 rounded-[28px] border border-slate-200 bg-white/90 p-5 shadow-[0_16px_60px_rgba(15,23,42,0.08)] backdrop-blur dark:border-slate-700 dark:bg-slate-900/90 xl:flex-row xl:items-center xl:justify-between">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.35em] text-emerald-700 dark:text-emerald-400">
+                  Results ready
+                </p>
+                <h2 className="mt-2 text-3xl font-white text-slate-200 sm:text-4xl">
+                  Official {drawType} Draw Report
+                </h2>
+              </div>
+              <DownloadPDFReport
+                results={results}
+                drawType={drawType}
+                drawNumber={drawConfigs[drawType].drawNumber}
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border cursor-pointer border-emerald-600 bg-emerald-700 px-8 py-3.5 text-base font-semibold text-white shadow-[0_16px_40px_rgba(5,150,105,0.25)] transition hover:-translate-y-0.5 hover:bg-emerald-800 focus:outline-none focus:ring-4 focus:ring-emerald-300 md:text-lg"
+              />
+            </div>
             <ResultsTable results={results} />
-            <button
-              onClick={() => {
-                setResults([]);
-                setDrawType(null);
-                setScreen("selection");
-              }}
-              className="mt-10 bg-green-700 text-white text-lg font-semibold px-6 py-3 rounded shadow hover:bg-green-800"
-            >
-              👉 Start Next Draw
-            </button>
-          </>
+            <div className="mt-8 flex justify-center">
+              <button
+                onClick={() => {
+                  setResults([]);
+                  setDrawType(null);
+                  setScreen("selection");
+                }}
+                className="rounded-2xl bg-slate-900 px-8 py-3.5 text-lg font-semibold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-slate-700"
+              >
+                Start Next Draw
+              </button>
+            </div>
+          </div>
         )}
       </main>
       {showModal && (
