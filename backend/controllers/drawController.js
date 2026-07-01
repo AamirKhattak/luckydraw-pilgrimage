@@ -113,6 +113,37 @@ exports.runDraw = async (req, res) => {
   }
 };
 
+exports.getAllDraws = async (req, res) => {
+  try {
+    const draws = await DrawType.findAll({
+      include: [
+        {
+          model: DrawResult,
+          include: [Employee],
+          order: [["position", "ASC"]],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    const formattedDraws = draws.map((draw) => ({
+      id: draw.id,
+      year: draw.year,
+      type: draw.type,
+      winners: draw.winners,
+      waiting: draw.waiting,
+      createdAt: draw.createdAt,
+      updatedAt: draw.updatedAt,
+      results: draw.DrawResults || [],
+    }));
+
+    res.status(200).json(formattedDraws);
+  } catch (err) {
+    console.error("Error fetching all draws:", err);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
 exports.getDrawResults = async (req, res) => {
   const { id } = req.params;
 

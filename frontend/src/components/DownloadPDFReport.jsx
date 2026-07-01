@@ -7,7 +7,7 @@ function toSentenceCase(str) {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
-const DownloadPDFReport = ({ results, drawType, drawNumber }) => {
+const DownloadPDFReport = ({ results, drawType, drawNumber, buttonLabel, className = "bg-green-700 text-white font-semibold px-6 py-2 rounded shadow-md mb-6 hover:cursor-pointer hover:bg-green-800 transition-colors duration-300 print:hidden" }) => {
   const drawLabel = toSentenceCase(drawType) || "PILGRIMAGE";
 
   const today = new Date().toLocaleDateString("en-US", {
@@ -15,6 +15,22 @@ const DownloadPDFReport = ({ results, drawType, drawNumber }) => {
     month: "long",
     day: "2-digit",
   });
+
+  const getEmployeeValue = (item, key) => {
+    const employee = item.employee || item.Employee || {};
+    return employee[key] ?? item[key] ?? "";
+  };
+
+  const getEmployeeNumber = (item) => {
+    const employee = item.employee || item.Employee || {};
+    return employee.employee_number || employee.employeeNumber || item.number || "";
+  };
+
+  const truncateText = (text, maxLength = 26) => {
+    const value = String(text ?? "");
+    if (value.length <= maxLength) return value;
+    return `${value.slice(0, maxLength - 1).trimEnd()}…`;
+  };
 
   const generatePDF = () => {
     const doc = new jsPDF();
@@ -30,8 +46,11 @@ const DownloadPDFReport = ({ results, drawType, drawNumber }) => {
       .sort((a, b) => a.position - b.position);
 
     logo.onload = () => {
+      let logoWidth = 40;
+      let logoHeight = (logo.height / logo.width) * logoWidth;
+
       const addHeader = () => {
-        doc.addImage(logo, "PNG", 10, 5, 25, 25);
+        doc.addImage(logo, "PNG", 15, 10, logoWidth, logoHeight);
         doc.setFontSize(14);
         doc.text("Oil & Gas Development Company Limited", 105, 15, {
           align: "center",
@@ -65,12 +84,12 @@ const DownloadPDFReport = ({ results, drawType, drawNumber }) => {
 
       winners.forEach((item) => {
         tableBody.push([
-          item.position,
-          item.number,
-          item.name,
-          item.designation,
-          item.department,
-          item.location,
+          getEmployeeValue(item, "position") || item.position,
+          getEmployeeNumber(item),
+          getEmployeeValue(item, "name"),
+          truncateText(getEmployeeValue(item, "designation"), 24),
+          truncateText(getEmployeeValue(item, "department"), 24),
+          truncateText(getEmployeeValue(item, "location"), 24),
         ]);
       });
 
@@ -79,19 +98,25 @@ const DownloadPDFReport = ({ results, drawType, drawNumber }) => {
 
         waiting.forEach((item) => {
           tableBody.push([
-            item.position,
-            item.number,
-            item.name,
-            item.designation,
-            item.department,
-            item.location,
+            getEmployeeValue(item, "position") || item.position,
+            getEmployeeNumber(item),
+            getEmployeeValue(item, "name"),
+            truncateText(getEmployeeValue(item, "designation"), 24),
+            truncateText(getEmployeeValue(item, "department"), 24),
+            truncateText(getEmployeeValue(item, "location"), 24),
           ]);
         });
       }
 
+      const pageHeight = doc.internal.pageSize.height;
+      const pageWidth = doc.internal.pageSize.width;
+      const signatureBlockHeight = 5;
+      const footerMargin = 15;
+      const reservedBottom = signatureBlockHeight + footerMargin + 15;
+
       autoTable(doc, {
-        startY: 50,
-        margin: { top: 50 },
+        startY: 40,
+        margin: { top: 50, bottom: reservedBottom },
         head: [
           [
             "Sr. No.",
@@ -103,7 +128,21 @@ const DownloadPDFReport = ({ results, drawType, drawNumber }) => {
           ],
         ],
         body: tableBody,
-        styles: { fontSize: 9, cellPadding: 2, textColor: 0, lineColor: 0 },
+        styles: {
+          fontSize: 9,
+          cellPadding: 2,
+          textColor: 0,
+          lineColor: 0,
+          overflow: "ellipsize",
+        },
+        columnStyles: {
+          0: { cellWidth: 15 },
+          1: { cellWidth: 22 },
+          2: { cellWidth: 40 },
+          3: { cellWidth: 35 },
+          4: { cellWidth: 35 },
+          5: { cellWidth: 35 },
+        },
         headStyles: {
           fillColor: [230, 230, 230],
           textColor: 0,
@@ -126,40 +165,54 @@ const DownloadPDFReport = ({ results, drawType, drawNumber }) => {
         },
       });
 
+      const pageCountBeforeSignatures = doc.internal.getNumberOfPages();
+      const lastTableY = doc.lastAutoTable?.finalY || 0;
+      let signaturePage = pageCountBeforeSignatures;
+      let signatureStartY = lastTableY + 20;
+      const maxFooterY = pageHeight - footerMargin;
+
+      if (signatureStartY + signatureBlockHeight > maxFooterY) {
+        doc.addPage();
+        signaturePage = doc.internal.getNumberOfPages();
+        signatureStartY = 25;
+      }
+
       const totalPages = doc.internal.getNumberOfPages();
 
-      // Apply footer and signature block after table rendering
+      const addFooter = (pageNumber) => {
+        doc.setFontSize(9);
+        doc.text(`${drawLabel} Draw No. ${drawNumber} - Held on ${today}`, 20, pageHeight - footerMargin);
+        doc.text(`Page ${pageNumber} of ${totalPages}`, pageWidth - 30, pageHeight - footerMargin, {
+          align: "right",
+        });
+      };
+
+      const addSignatures = (y) => {
+        doc.setFontSize(10);
+
+        doc.text("________________", 20, y);
+        doc.text("ED (HR)", 25, y + 5);
+
+        doc.text("________________", 60, y);
+        doc.text("GM (HR)", 65, y + 5);
+
+        doc.text("________________", 110, y);
+        doc.text("Manager (Policy)", 115, y + 5);
+
+        doc.text("________________", 150, y);
+        doc.text("GS (CBA)", 160, y + 5);
+
+        doc.text("__________________", 85, y + 25);
+        doc.text("MD/CEO", 95, y + 30);
+      };
+
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
-
-        // Footer
-        const pageHeight = doc.internal.pageSize.height;
-        doc.setFontSize(9);
-        doc.text(`${drawLabel} Draw No. ${drawNumber} - Held on ${today}`, 20, pageHeight - 15);
-        doc.text(`Page ${i} of ${totalPages}`, 180, pageHeight - 15);
-
-        // Signature block only on last page
-        if (i === totalPages) {
-          const finalY = doc.lastAutoTable.finalY + 30;
-
-          doc.setFontSize(10);
-
-          doc.text("________________", 20, finalY);
-          doc.text("ED (HR)", 25, finalY + 5);
-
-          doc.text("________________", 60, finalY);
-          doc.text("GM (HR)", 65, finalY + 5);
-
-          doc.text("________________", 110, finalY);
-          doc.text("Manager (Policy)", 115, finalY + 5);
-
-          doc.text("________________", 150, finalY);
-          doc.text("GS (CBA)", 160, finalY + 5);
-
-          doc.text("__________________", 85, finalY + 25);
-          doc.text("MD/CEO", 95, finalY + 30);
-        }
+        addFooter(i);
       }
+
+      doc.setPage(signaturePage);
+      addSignatures(signatureStartY);
 
       doc.save(`${drawLabel}_Draw_No_${drawNumber}_Final_Draw_Report.pdf`);
     };
@@ -168,9 +221,9 @@ const DownloadPDFReport = ({ results, drawType, drawNumber }) => {
   return (
     <button
       onClick={generatePDF}
-      className="bg-green-700 text-white font-semibold px-6 py-2 rounded shadow-md mb-6 hover:cursor-pointer hover:bg-green-800 transition-colors duration-300 print:hidden"
+      className={`${className} print:hidden`}
     >
-      📄 Download Final Draw Report
+      {buttonLabel || `📄 Download ${drawLabel} Draw Report`}
     </button>
   );
 };

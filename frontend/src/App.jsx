@@ -4,6 +4,7 @@ import ResultsTable from "./components/ResultsTable";
 import DownloadPDFReport from "./components/DownloadPDFReport";
 import WelcomeScreen from "./components/WelcomeScreen";
 import ConfirmModal from "./components/ConfirmModal";
+import DrawHistory from "./components/DrawHistory";
 
 import ogdclLogo from "../public/ogdcl_logo_hd.svg";
 
@@ -127,6 +128,7 @@ function App() {
                 );
               })}
             </div>
+            <DrawHistory />
           </>
         )}
 

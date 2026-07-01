@@ -18,3 +18,13 @@ export async function runDraw(drawPayload) {
     throw new Error(error);
   }
 }
+
+export async function fetchAllDraws() {
+  try {
+    const res = await axios.get(`${API_BASE}/draws`);
+    return res.data;
+  } catch (err) {
+    const error = err.response?.data?.error || "Failed to load draws";
+    throw new Error(error);
+  }
+}

@@ -92,7 +92,7 @@ const LuckyDraw = ({ drawType, config, onComplete }) => {
           clearInterval(countdownInterval);
           setShowCountdown(false);
           setIsDrawing(true);
-          startDraw();
+          //startDraw();
           return 0;
         }
         return prev - 1;
