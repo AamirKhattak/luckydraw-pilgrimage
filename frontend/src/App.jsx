@@ -170,7 +170,7 @@ function App() {
             <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <button
                 onClick={() => setShowModal(true)}
-                className="w-full rounded-3xl bg-emerald-700 px-8 py-4 text-lg font-semibold text-white shadow-lg transition hover:bg-emerald-800 sm:w-auto"
+                className="w-full rounded-3xl cursor-pointer bg-emerald-700 px-8 py-4 text-lg font-semibold text-white shadow-lg transition hover:bg-emerald-800 sm:w-auto"
               >
                 Start Draw
               </button>
@@ -179,7 +179,7 @@ function App() {
                   setPendingDrawType(null);
                   setScreen("selection");
                 }}
-                className="w-full rounded-3xl border border-slate-300 bg-white px-8 py-4 text-lg font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 sm:w-auto"
+                className="w-full rounded-3xl cursor-pointer border border-slate-300 bg-white px-8 py-4 text-lg font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 sm:w-auto"
               >
                 Back to selection
               </button>

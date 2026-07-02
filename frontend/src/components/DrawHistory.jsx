@@ -141,11 +141,11 @@ const DrawHistory = () => {
                     drawType={draw.type}
                     drawNumber={draw.id}
                     buttonLabel="📄 PDF"
-                    className="w-full sm:w-auto bg-green-700 hover:bg-green-800 text-white font-semibold px-4 py-2 rounded shadow-sm text-sm"
+                    className="w-full sm:w-auto cursor-pointer bg-green-700 hover:bg-green-800 text-white font-semibold px-4 py-2 rounded shadow-sm text-sm"
                   />
                   <button
                     onClick={() => downloadCsv(draw)}
-                    className="w-full sm:w-auto bg-blue-700 hover:bg-blue-800 text-white font-semibold px-4 py-2 rounded shadow-sm text-sm"
+                    className="w-full sm:w-auto cursor-pointer bg-blue-700 hover:bg-blue-800 text-white font-semibold px-4 py-2 rounded shadow-sm text-sm"
                   >
                     📊 CSV
                   </button>

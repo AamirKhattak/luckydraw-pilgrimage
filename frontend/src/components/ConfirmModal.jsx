@@ -17,13 +17,13 @@ const ConfirmModal = ({ drawType, onConfirm, onCancel }) => {
         <div className="flex justify-center gap-4">
           <button
             onClick={onConfirm}
-            className="bg-green-700 hover:bg-green-800 text-white px-6 py-2 rounded-lg shadow-md transition duration-200"
+            className="bg-green-700 cursor-pointer hover:bg-green-800 text-white px-6 py-2 rounded-lg shadow-md transition duration-200"
           >
             ✅ Proceed with Draw
           </button>
           <button
             onClick={onCancel}
-            className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg shadow-md transition duration-200"
+            className="bg-gray-500 cursor-pointer hover:bg-gray-600 text-white px-6 py-2 rounded-lg shadow-md transition duration-200"
           >
             ❌ Cancel
           </button>
