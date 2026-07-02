@@ -84,10 +84,10 @@ function App() {
           <img
             src={ogdclLogo}
             alt="OGDCL Logo"
-            className={`${screen === "drawing" ? " w-20 md:w-40 " : " w-40 md:w-96 "} print:mb-2 mb-4`}
+            className={`${screen === "drawing" ? " w-20 md:w-40 " : " w-40 md:w-96 "} ${screen === "welcome" ? " pt-16 ": ""} print:mb-2 mb-4`}
           />
 
-          <h1 className={`flex-1 text-right font-extrabold mb-4 print:text-3xl drop-shadow-lg ${screen === "drawing" ? " text-3xl " : " text-7xl "}`}>
+          <h1 className={`flex-1 text-right font-extrabold mb-4 print:text-3xl drop-shadow-lg ${screen === "drawing" ? " text-3xl " : " text-7xl "} ${screen === "welcome" ? " hidden ": ""}`}>
             Hajj & Umrah Lucky Draw
           </h1>
         </div>
