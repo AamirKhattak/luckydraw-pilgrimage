@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from "react";
 import confetti from "canvas-confetti";
-import { runDraw } from "../services/api"; // ✅ import backend API
+import { runDraw, fetchDrawLogs } from "../services/api"; // ✅ import backend API
+import CounterDisplay from "./CounterDisplay";
+import DrawInfoCard from "./DrawInfoCard";
+import RandomLogPanel from "./RandomLogPanel";
 
 const LuckyDraw = ({ drawType, config, onComplete }) => {
   const [currentNumber, setCurrentNumber] = useState("------");
   const [results, setResults] = useState([]);
+  const [drawLogs, setDrawLogs] = useState([]);
+  const [visibleLogCount, setVisibleLogCount] = useState(0);
+  const [activeLogId, setActiveLogId] = useState(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [countdown, setCountdown] = useState(3);
   const [showCountdown, setShowCountdown] = useState(true);
@@ -37,6 +43,24 @@ const LuckyDraw = ({ drawType, config, onComplete }) => {
     });
   };
 
+  const playLogsUntil = async (logs, targetIndex) => {
+    if (targetIndex < 0) return;
+    let visible = visibleLogCount;
+    while (visible <= targetIndex && visible < logs.length) {
+      const log = logs[visible];
+      setCurrentNumber(log.generated_number);
+      setActiveLogId(log.id);
+      setVisibleLogCount(visible + 1);
+      visible += 1;
+      await new Promise((res) => setTimeout(res, testMode ? 25 : 80));
+    }
+    if (targetIndex >= logs.length && logs.length > 0) {
+      const finalLog = logs[logs.length - 1];
+      setCurrentNumber(finalLog.generated_number);
+      setActiveLogId(finalLog.id);
+    }
+  };
+
   const startDraw = async () => {
     try {
       // ✅ Send full payload to match backend expectations
@@ -47,9 +71,15 @@ const LuckyDraw = ({ drawType, config, onComplete }) => {
         year: config.drawYear,
       });
 
+      const logs = await fetchDrawLogs(response.draw_id);
+      setDrawLogs(logs);
+      setVisibleLogCount(logs.length > 0 ? 1 : 0);
+      setActiveLogId(null);
+
       console.log(response);
       // 🔁 Transform backend response to frontend-friendly format
       const data = response.results.map((entry) => ({
+        employee_id: entry.employee.id,
         number: entry.employee.employee_number,
         name: entry.employee.name,
         designation: entry.employee.designation,
@@ -64,10 +94,20 @@ const LuckyDraw = ({ drawType, config, onComplete }) => {
       const fullResult = [];
       for (let i = 0; i < data.length; i++) {
         const item = data[i];
-        await animateNumber(item.number, 80);
+        const matchingLogIndex = logs.findIndex(
+          (log) =>
+            log.generated_number === item.random_number_used &&
+            log.matched_employee_id === item.employee_id
+        );
+        const matchingLog = matchingLogIndex >= 0 ? logs[matchingLogIndex] : null;
+
+        await playLogsUntil(logs, matchingLogIndex);
+        setActiveLogId(matchingLog?.id ?? null);
+
+        setCurrentNumber(item.number);
         fullResult.push(item);
         setResults([...fullResult]);
-        await new Promise((res) => setTimeout(res, testMode ? 200 : 3000));
+        await new Promise((res) => setTimeout(res, testMode ? 200 : 1500));
       }
 
       setIsDrawing(false);
@@ -85,6 +125,9 @@ const LuckyDraw = ({ drawType, config, onComplete }) => {
     setShowCountdown(true);
     setShowCongrats(false);
     setIsDrawing(false);
+    setDrawLogs([]);
+    setVisibleLogCount(0);
+    setActiveLogId(null);
 
     const countdownInterval = setInterval(() => {
       setCountdown((prev) => {
@@ -136,7 +179,7 @@ const LuckyDraw = ({ drawType, config, onComplete }) => {
   const current = results.length > 0 ? results[results.length - 1] : null;
 
   return (
-    <div className="mt-10 flex flex-col items-center">
+    <div className="mt-10 flex h-full w-full max-w-full flex-col items-center justify-center overflow-hidden">
       {showCountdown && (
         <div className="text-6xl font-extrabold text-red-500 mb-6 animate-bounce">
           Starting in {countdown}...
@@ -144,61 +187,19 @@ const LuckyDraw = ({ drawType, config, onComplete }) => {
       )}
 
       {!showCountdown && !showCongrats && (
-        <>
-          <div className="bg-white text-black font-semibold text-[9vw] md:text-9xl tracking-wide px-12 py-4 rounded-lg border border-gray-300 shadow-md">
-            {currentNumber}
+        <div className="flex w-full max-w-[1600px] flex-col gap-6 lg:flex-row lg:items-start">
+          <div className="flex-1 min-w-0">
+            <CounterDisplay number={currentNumber} />
+            <DrawInfoCard current={current} results={results} config={config} />
           </div>
 
-          {isDrawing && current && (
-            <div className="relative bg-white dark:bg-gray-800  shadow-2xl rounded-2xl px-12 py-10 mt-10 w-[95vw] max-w-4xl min-h-[320px] text-center animate-fade-in transition duration-300 overflow-hidden">
-              <p className="mb-6">
-                <span
-                  className={`inline-block px-6 py-2 text-lg font-bold rounded-full shadow-md tracking-wide
-                  ${
-                    current.status === "winner"
-                      ? "bg-green-600 text-white"
-                      : "bg-yellow-400 text-black"
-                  }`}
-                >
-                  {current.status === "winner" ? "Winner" : "Waiting List"}
-                </span>
-              </p>
-
-              <h3 className="text-4xl md:text-5xl font-extrabold text-green-700 dark:text-green-400 mb-6">
-                <p className="text-4xl text-gray-700 dark:text-gray-300 mb-2">
-                  <strong>{current.number}</strong>
-                </p>
-                {current.name}
-              </h3>
-
-              <p className="text-2xl text-gray-700 dark:text-gray-300 mb-2">
-                {current.designation} — {current.department}
-              </p>
-              <p className="text-xl text-gray-600 dark:text-gray-400 italic">
-                {current.location}
-              </p>
-              <p className="text-lg text-gray-500 mt-6">
-                {current.status === "waiting"
-                  ? `Waiting List Position ${results.length} of ${
-                      config.winners + config.waiting
-                    }`
-                  : `Winner ${results.length} of ${
-                      config.winners + config.waiting
-                    }`}
-              </p>
-            </div>
-          )}
-        </>
-      )}
-
-      {showCongrats && (
-        <div className="mt-16 text-center animate-fade-in">
-          <h2 className="text-6xl font-extrabold text-green-400 mb-6">
-            🎊 Congratulations! 🎊
-          </h2>
-          <p className="text-3xl text-black dark:text-white">
-            All winners have been drawn.
-          </p>
+          <div className="flex w-full flex-col gap-4 lg:w-[420px] lg:min-w-[420px]">
+            <RandomLogPanel
+              drawLogs={drawLogs}
+              visibleLogCount={visibleLogCount}
+              activeLogId={activeLogId}
+            />
+          </div>
         </div>
       )}
     </div>

@@ -164,3 +164,29 @@ exports.getDrawResults = async (req, res) => {
     res.status(500).json({ error: "Internal server error." });
   }
 };
+
+exports.getDrawLogs = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const logs = await RandomLog.findAll({
+      where: { draw_type_id: id },
+      include: [
+        {
+          model: Employee,
+          attributes: ["id", "employee_number", "name"],
+        },
+      ],
+      order: [["createdAt", "ASC"]],
+    });
+
+    if (!logs.length) {
+      return res.status(200).json([]);
+    }
+
+    res.status(200).json(logs);
+  } catch (err) {
+    console.error("Error fetching random logs:", err);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
