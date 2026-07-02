@@ -5,13 +5,10 @@ import DownloadPDFReport from "./components/DownloadPDFReport";
 import WelcomeScreen from "./components/WelcomeScreen";
 import ConfirmModal from "./components/ConfirmModal";
 import DrawHistory from "./components/DrawHistory";
+import drawConfigs from "./config/drawConfigs";
+import { toFirstWordUpper } from "./utils/textUtils";
 
 import ogdclLogo from "../public/ogdcl_logo_hd.svg";
-
-const drawConfigs = {
-  hajj: { winners: 57, waiting: 25, drawYear: 2026, drawNumber: 41 },
-  umrah: { winners: 12, waiting: 8, drawYear: 2026, drawNumber: 13 },
-};
 
 function App() {
   const [screen, setScreen] = useState("welcome");
@@ -25,7 +22,7 @@ function App() {
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     const prefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)"
+      "(prefers-color-scheme: dark)",
     ).matches;
     const initialTheme = savedTheme || (prefersDark ? "dark" : "light");
     setTheme(initialTheme);
@@ -43,12 +40,24 @@ function App() {
   const handleStartDraw = async (type) => {
     setDrawType(null);
     setResults([]);
+    setPendingDrawType(type);
     setTimeout(() => setDrawType(type), 100);
   };
 
   const handleResults = (newResults) => {
     const reversed = [...newResults].reverse();
     setResults(reversed);
+  };
+
+  const openDrawConfirmation = (type) => {
+    setPendingDrawType(type);
+    setScreen("confirmDraw");
+  };
+
+  const startConfirmedDraw = () => {
+    setShowModal(false);
+    handleStartDraw(pendingDrawType);
+    setScreen("drawing");
   };
 
   const handleFullScreen = () => {
@@ -68,39 +77,30 @@ function App() {
 
   return (
     <div className="flex flex-col min-h-screen bg-blue-50 dark:bg-gradient-to-br dark:from-black dark:via-gray-800 dark:to-black text-black dark:text-white transition-colors duration-300 print:bg-white print:text-black">
-      <main className="flex-grow p-8 flex flex-col items-center justify-start">
-                  <img
+      <main className="flex-grow p-2  flex flex-col items-center justify-start">
+        <div
+          className={`w-full flex items-center mb-12 mt-2 print:mb-4 ${screen === "drawing" ? "justify-between" : "justify-center"} ${screen === "drawing" ? "flex-row" : "flex-col"}`}
+        >
+          <img
             src={ogdclLogo}
             alt="OGDCL Logo"
-            className="w-96  mb-6 print:mb-2"
+            className={`${screen === "drawing" ? " w-20 md:w-40 " : " w-40 md:w-96 "} print:mb-2 mb-4`}
           />
-        <div className="w-full flex flex-row justify-center items-center mb-12 print:mb-4 space-x-4">
 
-          <h1 className="text-7xl font-extrabold mb-4 print:text-3xl drop-shadow-lg text-center">
+          <h1 className={`flex-1 text-right font-extrabold mb-4 print:text-3xl drop-shadow-lg ${screen === "drawing" ? " text-3xl " : " text-7xl "}`}>
             Hajj & Umrah Lucky Draw
           </h1>
-          <div className="relative group">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 transition">
-              <button
-                onClick={toggleTheme}
-                className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-              >
-                {theme === "dark" ? "🌞" : "🌙"}
-              </button>
-            </div>
-          </div>
         </div>
 
         {screen === "welcome" && (
           <>
             <WelcomeScreen onProceed={() => setScreen("selection")} />
-            <button onClick={handleFullScreen}>⛶</button>
           </>
         )}
 
         {screen === "selection" && (
           <>
-            <div className="mb-12 flex flex-col gap-4 md:flex-row md:justify-center">
+            <div className="my-20 mb-12 flex flex-col gap-20 h-20 md:flex-row md:justify-center">
               {Object.keys(drawConfigs).map((type) => {
                 const isCompleted = completedDraws.includes(type);
                 return (
@@ -108,23 +108,19 @@ function App() {
                     key={type}
                     onClick={() => {
                       if (!isCompleted) {
-                        // handleStartDraw(type);
-                        // setScreen("drawing");
-                        setPendingDrawType(type);
-                        setShowModal(true);
+                        openDrawConfirmation(type);
                       }
                     }}
                     disabled={isCompleted}
                     className={`inline-flex items-center justify-center rounded-[24px] border px-8 py-4 text-lg font-semibold shadow-[0_16px_40px_rgba(15,23,42,0.14)] transition-all duration-300 print:hidden md:text-xl ${
                       isCompleted
                         ? "cursor-not-allowed border-slate-300 bg-slate-200 text-slate-500"
-                        : "border-emerald-600 bg-emerald-700 text-white hover:-translate-y-1 hover:bg-emerald-800 hover:shadow-[0_20px_50px_rgba(5,150,105,0.25)] dark:border-emerald-500 dark:bg-emerald-600 dark:hover:bg-emerald-500"
+                        : "border-emerald-600 cursor-pointer  bg-emerald-700 text-white hover:-translate-y-1 hover:bg-emerald-800 hover:shadow-[0_20px_50px_rgba(5,150,105,0.25)] dark:border-emerald-500 dark:bg-emerald-600 dark:hover:bg-emerald-500"
                     }`}
                   >
-                    
                     {isCompleted
-                      ? `${type.toUpperCase()} Draw Done`
-                      : `Start ${type.toUpperCase()} Draw`}
+                      ? `${toFirstWordUpper(type)} Draw Done`
+                      : `Start ${toFirstWordUpper(type)} Draw`}
                   </button>
                 );
               })}
@@ -133,17 +129,107 @@ function App() {
           </>
         )}
 
+        {screen === "confirmDraw" && pendingDrawType && (
+          <div className="w-full max-w-4xl rounded-[28px] border border-slate-200 bg-white/90 p-8 shadow-[0_16px_60px_rgba(15,23,42,0.08)] backdrop-blur dark:border-slate-700 dark:bg-slate-900/90">
+            <div className="mb-8">
+              <p className="text-sm font-semibold uppercase tracking-[0.35em] text-emerald-700 dark:text-emerald-400">
+                Ready to start
+              </p>
+              <h2 className="mt-3 text-4xl font-bold text-slate-900 dark:text-white">
+                {toFirstWordUpper(pendingDrawType)} Draw Info
+              </h2>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6 text-center dark:border-slate-700 dark:bg-slate-950">
+                <p className="text-sm uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">
+                  Draw Number
+                </p>
+                <p className="mt-3 text-3xl font-semibold text-slate-900 dark:text-white">
+                  {drawConfigs[pendingDrawType].drawNumber}
+                </p>
+              </div>
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6 text-center dark:border-slate-700 dark:bg-slate-950">
+                <p className="text-sm uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">
+                  Winners
+                </p>
+                <p className="mt-3 text-3xl font-semibold text-slate-900 dark:text-white">
+                  {drawConfigs[pendingDrawType].winners}
+                </p>
+              </div>
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6 text-center dark:border-slate-700 dark:bg-slate-950">
+                <p className="text-sm uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">
+                  Waiting List
+                </p>
+                <p className="mt-3 text-3xl font-semibold text-slate-900 dark:text-white">
+                  {drawConfigs[pendingDrawType].waiting}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <button
+                onClick={() => setShowModal(true)}
+                className="w-full rounded-3xl bg-emerald-700 px-8 py-4 text-lg font-semibold text-white shadow-lg transition hover:bg-emerald-800 sm:w-auto"
+              >
+                Start Draw
+              </button>
+              <button
+                onClick={() => {
+                  setPendingDrawType(null);
+                  setScreen("selection");
+                }}
+                className="w-full rounded-3xl border border-slate-300 bg-white px-8 py-4 text-lg font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 sm:w-auto"
+              >
+                Back to selection
+              </button>
+            </div>
+          </div>
+        )}
+
         {screen === "drawing" && drawType && (
           <>
-            <div className="flex items-center justify-center gap-4 mb-10 animate-fade-in">
-              <span className="text-3xl md:text-4xl text-green-600">📣</span>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white text-center tracking-wide">
-                {drawType.toUpperCase()} Draw
-                <span className="block text-xl font-medium text-gray-600 dark:text-gray-300 mt-2">
-                  Official Draw No. {drawConfigs[drawType].drawNumber} in
-                  Progress
-                </span>
-              </h2>
+            <div className="w-full max-w-6xl rounded-[30px] border border-slate-200 bg-white/90 p-6 shadow-[0_20px_80px_rgba(15,23,42,0.08)] backdrop-blur dark:border-slate-700 dark:bg-slate-950/90 mb-10 animate-fade-in">
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <p className="flex flex-row gap-2 items-center text-sm uppercase tracking-[0.35em] text-emerald-700 dark:text-emerald-400">
+                    <span class="relative flex h-3 w-3">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                    </span>
+                    Live draw in progress
+                  </p>
+                  <h2 className="mt-3 text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-wide">
+                    {toFirstWordUpper(drawType)} Draw
+                  </h2>
+                </div>
+                <div className="grid gap-4 md:grid-cols-3">
+                <div className="rounded-3xl bg-slate-100 px-5 py-4 text-center text-slate-700 shadow-sm dark:bg-slate-900 dark:text-slate-100">
+                  <p className="text-sm uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">
+                    Draw No.
+                  </p>
+                  <p className="mt-2 text-2xl font-semibold">
+                    {drawConfigs[drawType].drawNumber}
+                  </p>
+                </div>
+                <div className="rounded-3xl bg-slate-100 px-5 py-4 text-center text-slate-700 shadow-sm dark:bg-slate-900 dark:text-slate-100">
+                  <p className="text-sm uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">
+                    Winners
+                  </p>
+                  <p className="mt-2 text-2xl font-semibold">
+                    {drawConfigs[pendingDrawType].winners}
+                  </p>
+                </div>
+                <div className="rounded-3xl bg-slate-100 px-5 py-4 text-center text-slate-700 shadow-sm dark:bg-slate-900 dark:text-slate-100">
+                  <p className="text-sm uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">
+                    Waiting List
+                  </p>
+                  <p className="mt-2 text-2xl font-semibold">
+                    {drawConfigs[pendingDrawType].waiting}
+                  </p>
+                </div>
+              </div>
+              </div>
             </div>
 
             <LuckyDraw
@@ -166,7 +252,7 @@ function App() {
                   Results ready
                 </p>
                 <h2 className="mt-2 text-3xl font-white text-slate-200 sm:text-4xl">
-                  Official {drawType} Draw Report
+                  Official {toFirstWordUpper(drawType)} Draw Report
                 </h2>
               </div>
               <DownloadPDFReport
@@ -195,20 +281,36 @@ function App() {
       {showModal && (
         <ConfirmModal
           drawType={pendingDrawType}
-          onConfirm={() => {
-            setShowModal(false);
-            handleStartDraw(pendingDrawType);
-            setScreen("drawing");
-          }}
+          onConfirm={startConfirmedDraw}
           onCancel={() => {
             setShowModal(false);
             setPendingDrawType(null);
+            setScreen("selection");
           }}
         />
       )}
 
-      <footer className="text-md text-gray-500 dark:text-gray-400 text-center py-4">
-        Developed by the In-House IT Applications Team, Systems Department
+      <footer className="text-md text-gray-500 flex flex-row justify-center items-end dark:text-gray-400 text-center py-4">
+        <p className="mr-10">
+          Developed by the In-House IT Applications Team, Systems
+          Department{" "}
+        </p>
+        <div className="relative group">
+          <div className="rounded-full flex items-center justify-center bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+            <button
+              onClick={toggleTheme}
+              className="opacity-5 grayscale group-hover:opacity-100 transition-opacity duration-300"
+            >
+              {theme === "dark" ? "🌞" : "🌙"}
+            </button>
+          </div>
+        </div>
+        <button
+          onClick={handleFullScreen}
+          className="text-gray-500 dark:text-gray-100 opacity-5 hover:opacity-100 transition ml-4"
+        >
+          ⛶
+        </button>
       </footer>
     </div>
   );

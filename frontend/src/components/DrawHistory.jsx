@@ -101,9 +101,7 @@ const DrawHistory = () => {
       <div className="flex flex-col gap-2 mb-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Reports</h2>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 max-w-2xl">
-            Download each draw report as PDF or CSV. Recent draws are shown here with winner and waiting summaries.
-          </p>
+
         </div>
       </div>
 

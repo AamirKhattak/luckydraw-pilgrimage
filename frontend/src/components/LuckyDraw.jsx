@@ -32,7 +32,7 @@ const LuckyDraw = ({ drawType, config, onComplete }) => {
             resolve();
           }
         },
-        testMode ? 30 : delay
+        testMode ? 30 : delay,
       );
     });
   };
@@ -145,24 +145,43 @@ const LuckyDraw = ({ drawType, config, onComplete }) => {
 
       {!showCountdown && !showCongrats && (
         <>
-          <div className="bg-white text-black font-semibold text-[9vw] md:text-9xl tracking-wide px-12 py-4 rounded-lg border border-gray-300 shadow-md">
-            {currentNumber}
+          <div className="relative mb-10 w-full max-w-4xl">
+            <div className="absolute inset-x-0 top-1/2 h-40 -translate-y-1/2 rounded-[2rem] bg-gradient-to-r from-emerald-500/10 via-slate-100/80 to-emerald-500/10 blur-3xl" />
+            <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center justify-center gap-4 rounded-[2rem] border border-slate-200 bg-white/95 px-8 py-8 text-center shadow-[0_35px_80px_rgba(15,23,42,0.12)] backdrop-blur dark:border-slate-700 dark:bg-slate-950/95">
+              <span className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold uppercase tracking-[0.35em] text-white shadow-sm">
+                Selected Employee Number
+              </span>
+              <div className="font-mono text-[14vw] leading-none md:text-[8rem] font-black tracking-[0.02em] text-slate-900 dark:text-white">
+                {currentNumber}
+              </div>
+            </div>
           </div>
 
           {isDrawing && current && (
-            <div className="relative bg-white dark:bg-gray-800  shadow-2xl rounded-2xl px-12 py-10 mt-10 w-[95vw] max-w-4xl min-h-[320px] text-center animate-fade-in transition duration-300 overflow-hidden">
-              <p className="mb-6">
-                <span
-                  className={`inline-block px-6 py-2 text-lg font-bold rounded-full shadow-md tracking-wide
+            <div className="relative bg-white dark:bg-gray-800 shadow-2xl rounded-3xl px-10 py-10 mt-2 w-[95vw] max-w-4xl min-h-[320px] text-center animate-fade-in transition duration-300 overflow-hidden">
+              <div className="flex flex-row justify-between items-start">
+                <p className="">
+                  <span
+                    className={`inline-block px-6 py-2 text-lg font-bold rounded-full shadow-md tracking-wide
                   ${
                     current.status === "winner"
                       ? "bg-green-600 text-white"
                       : "bg-yellow-400 text-black"
                   }`}
-                >
-                  {current.status === "winner" ? "Winner" : "Waiting List"}
-                </span>
-              </p>
+                  >
+                    {current.status === "winner" ? "Winner" : "Waiting List"}
+                  </span>
+                </p>
+                <p className="text-lg text-gray-500">
+                  {current.status === "waiting"
+                    ? `Waiting List Position ${results.length} of ${
+                        config.winners + config.waiting
+                      }`
+                    : `Winner ${results.length} of ${
+                        config.winners + config.waiting
+                      }`}
+                </p>
+              </div>
 
               <h3 className="text-4xl md:text-5xl font-extrabold text-green-700 dark:text-green-400 mb-6">
                 <p className="text-4xl text-gray-700 dark:text-gray-300 mb-2">
@@ -176,15 +195,6 @@ const LuckyDraw = ({ drawType, config, onComplete }) => {
               </p>
               <p className="text-xl text-gray-600 dark:text-gray-400 italic">
                 {current.location}
-              </p>
-              <p className="text-lg text-gray-500 mt-6">
-                {current.status === "waiting"
-                  ? `Waiting List Position ${results.length} of ${
-                      config.winners + config.waiting
-                    }`
-                  : `Winner ${results.length} of ${
-                      config.winners + config.waiting
-                    }`}
               </p>
             </div>
           )}
