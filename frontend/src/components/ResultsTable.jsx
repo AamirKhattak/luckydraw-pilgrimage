@@ -18,12 +18,12 @@ const ResultsTable = ({ results }) => {
           <h2 className="text-2xl font-semibold sm:text-3xl">{title}</h2>
           {/* <p className="text-base opacity-80">{list.length} entries</p> */}
         </div>
-
+{/* 
         <span
           className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] ${badgeClass}`}
         >
           {title.includes("Winners") ? "Selected" : "Reserve"}
-        </span>
+        </span> */}
       </div>
 
       <div className="overflow-x-auto">

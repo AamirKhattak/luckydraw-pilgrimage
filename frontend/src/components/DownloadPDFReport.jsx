@@ -2,6 +2,7 @@ import React from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
+
 function toSentenceCase(str) {
   if (!str) return "";
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -56,7 +57,7 @@ const DownloadPDFReport = ({ results, drawType, drawNumber, buttonLabel, classNa
           align: "center",
         });
         doc.setFontSize(12);
-        doc.text(`${drawLabel} Draw No. ${drawNumber} (For the Year 2025-2026)`, 105, 22, { align: "center" });
+        doc.text(`${drawLabel} Draw No. ${drawNumber} (For the Year 2026-2027)`, 105, 22, { align: "center" });
         doc.text("List of Selected Employees", 105, 28, { align: "center" });
 
         doc.setFontSize(10);
@@ -194,10 +195,10 @@ const DownloadPDFReport = ({ results, drawType, drawNumber, buttonLabel, classNa
         doc.text("ED (HR)", 25, y + 5);
 
         doc.text("________________", 60, y);
-        doc.text("GM (HR)", 65, y + 5);
+        doc.text("M (HR)", 65, y + 5);
 
         doc.text("________________", 110, y);
-        doc.text("Manager (Policy)", 115, y + 5);
+        doc.text("CHRO (Policy)", 115, y + 5);
 
         doc.text("________________", 150, y);
         doc.text("GS (CBA)", 160, y + 5);
