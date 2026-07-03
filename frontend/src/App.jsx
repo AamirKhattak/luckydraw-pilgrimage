@@ -5,6 +5,8 @@ import DownloadPDFReport from "./components/DownloadPDFReport";
 import WelcomeScreen from "./components/WelcomeScreen";
 import ConfirmModal from "./components/ConfirmModal";
 import DrawHistory from "./components/DrawHistory";
+
+import RandomLogReport from "./components/RandomLogReport";
 import drawConfigs from "./config/drawConfigs";
 import { toFirstWordUpper } from "./utils/textUtils";
 
@@ -63,6 +65,12 @@ function App() {
   const handleLogoClick = () => {
     if (screen !== "drawing") {
       setScreen("selection");
+    }
+  };
+
+  const handleLogPage = () => {
+    if (screen !== "drawing") {
+      setScreen("randomLogs");
     }
   };
 
@@ -143,7 +151,7 @@ function App() {
                 Ready to start
               </p>
               <h2 className="mt-3 text-4xl font-bold text-slate-900 dark:text-white">
-                {toFirstWordUpper(pendingDrawType)} Draw Info
+                {toFirstWordUpper(pendingDrawType)} Draw {drawConfigs[pendingDrawType].yearFrom}-{drawConfigs[pendingDrawType].yearTo}
               </h2>
             </div>
 
@@ -200,9 +208,9 @@ function App() {
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
                   <p className="flex flex-row gap-2 items-center text-sm uppercase tracking-[0.35em] text-emerald-700 dark:text-emerald-400">
-                    <span class="relative flex h-3 w-3">
-                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                      <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                    <span className="relative flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
                     </span>
                     Live draw in progress
                   </p>
@@ -257,9 +265,12 @@ function App() {
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.35em] text-emerald-700 dark:text-emerald-400">
                   Results ready
+                  <span className="ml-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+                    Draw No. {drawConfigs[drawType].drawNumber} • {drawConfigs[drawType].yearFrom}-{drawConfigs[drawType].yearTo}
+                  </span>
                 </p>
                 <h2 className="mt-2 text-3xl font-white text-slate-200 sm:text-4xl">
-                  Official {toFirstWordUpper(drawType)} Draw Report
+                  Official {toFirstWordUpper(drawType)} Draw Results
                 </h2>
               </div>
               <DownloadPDFReport
@@ -285,6 +296,33 @@ function App() {
             </div>
           </div>
         )}
+
+        {screen === "randomLogs" && (
+          <div className="w-full max-w-7xl">
+            <div className="mb-6 rounded-[28px] border border-slate-200 bg-white/90 p-5 shadow-[0_16px_60px_rgba(15,23,42,0.08)] backdrop-blur dark:border-slate-700 dark:bg-slate-900/90">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">
+                  Random log report
+                </p>
+                <h2 className="mt-2 text-3xl font-white text-slate-200 sm:text-4xl">
+                  Draw generation audit logs
+                </h2>
+                <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                  Select a completed draw to inspect every generated number and match outcome.
+                </p>
+              </div>
+            </div>
+            <RandomLogReport />
+            <div className="mt-8 flex justify-center">
+              <button
+                onClick={() => setScreen("selection")}
+                className="rounded-2xl bg-slate-900 px-8 py-3.5 text-lg font-semibold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-slate-700"
+              >
+                Back to Draw Selection
+              </button>
+            </div>
+          </div>
+        )}
       </main>
       {showModal && (
         <ConfirmModal
@@ -303,10 +341,18 @@ function App() {
           Developed by the In-House IT Applications Team, Systems
           Department{" "}
         </p>
+        <button
+          onClick={handleLogPage}
+          className="opacity-5 hover:opacity-100 rounded-full border border-gray-300 bg-white/80 text-gray-700 hover:bg-emerald-50 dark:border-slate-700 dark:bg-slate-900 dark:text-gray-100 dark:hover:bg-slate-800 transition"
+          title="View random log report"
+        >
+          📄
+        </button>
         <div className="relative group">
-          <div className="rounded-full flex items-center justify-center bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+          <div className="ml-5 rounded-full flex items-center justify-center bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 transition">
             <button
               onClick={toggleTheme}
+              title="Toggle light/dark mode"
               className="opacity-5 grayscale group-hover:opacity-100 transition-opacity duration-300"
             >
               {theme === "dark" ? "🌞" : "🌙"}
@@ -315,6 +361,7 @@ function App() {
         </div>
         <button
           onClick={handleFullScreen}
+          title="Toggle fullscreen mode"
           className="text-gray-500 dark:text-gray-100 opacity-5 hover:opacity-100 transition ml-4"
         >
           ⛶

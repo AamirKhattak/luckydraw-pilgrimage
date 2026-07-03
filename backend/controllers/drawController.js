@@ -170,3 +170,35 @@ exports.getDrawResults = async (req, res) => {
     res.status(500).json({ error: "Internal server error." });
   }
 };
+
+exports.getDrawLogs = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const logs = await RandomLog.findAll({
+      where: { draw_type_id: id },
+      include: [Employee],
+      order: [["createdAt", "ASC"]],
+    });
+
+    if (!logs.length) {
+      return res.status(404).json({ error: "No logs found for this draw ID." });
+    }
+
+    const formattedLogs = logs.map((log) => ({
+      id: log.id,
+      drawTypeId: log.draw_type_id,
+      generatedNumber: log.generated_number,
+      matchedEmployee: log.matched_employee,
+      matchedEmployeeId: log.matched_employee_id,
+      employeeNumber: log.Employee?.employee_number || null,
+      employeeName: log.Employee?.name || null,
+      createdAt: log.createdAt,
+    }));
+
+    res.status(200).json(formattedLogs);
+  } catch (err) {
+    console.error("Error fetching draw logs:", err);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};

@@ -28,3 +28,13 @@ export async function fetchAllDraws() {
     throw new Error(error);
   }
 }
+
+export async function fetchDrawLogs(drawId) {
+  try {
+    const res = await axios.get(`${API_BASE}/draw/${drawId}/logs`);
+    return res.data;
+  } catch (err) {
+    const error = err.response?.data?.error || "Failed to load draw logs";
+    throw new Error(error);
+  }
+}
