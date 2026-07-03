@@ -8,7 +8,7 @@ function toSentenceCase(str) {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
-const DownloadPDFReport = ({ results, drawType, drawNumber, buttonLabel, className = "inline-flex items-center justify-center gap-2 rounded-2xl border border-emerald-600 bg-emerald-700 px-8 py-3.5 text-base font-semibold text-white shadow-[0_16px_40px_rgba(5,150,105,0.25)] transition hover:-translate-y-0.5 hover:bg-emerald-800 focus:outline-none focus:ring-4 focus:ring-emerald-300 print:hidden md:text-lg lg:px-9 lg:py-4" }) => {
+const DownloadPDFReport = ({ results, drawType, drawNumber, drawConfig, buttonLabel, className = "inline-flex items-center justify-center gap-2 rounded-2xl border border-emerald-600 bg-emerald-700 px-8 py-3.5 text-base font-semibold text-white shadow-[0_16px_40px_rgba(5,150,105,0.25)] transition hover:-translate-y-0.5 hover:bg-emerald-800 focus:outline-none focus:ring-4 focus:ring-emerald-300 print:hidden md:text-lg lg:px-9 lg:py-4" }) => {
   const drawLabel = toSentenceCase(drawType) || "PILGRIMAGE";
 
   const today = new Date().toLocaleDateString("en-US", {
@@ -57,7 +57,7 @@ const DownloadPDFReport = ({ results, drawType, drawNumber, buttonLabel, classNa
           align: "center",
         });
         doc.setFontSize(12);
-        doc.text(`${drawLabel} Draw No. ${drawNumber} (For the Year 2026-2027)`, 105, 22, { align: "center" });
+        doc.text(`${drawLabel} Draw No. ${drawNumber} (For the Year ${drawConfig.yearFrom}-${drawConfig.yearTo})`, 105, 22, { align: "center" });
         doc.text("List of Selected Employees", 105, 28, { align: "center" });
 
         doc.setFontSize(10);

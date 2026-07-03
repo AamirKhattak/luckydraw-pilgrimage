@@ -23,7 +23,7 @@ const downloadCsv = (draw) => {
   const rows = getReportRows(draw.results || []);
   const headers = ["Position", "Employee No", "Name", "Designation", "Department", "Location", "Status"];
   const csvRows = [headers.join(",")];
-
+    console.log(draw);
   rows.forEach((row) => {
     const values = headers.map((header) => {
       const valueMap = {
@@ -96,6 +96,7 @@ const DrawHistory = () => {
     return <p className="mt-8 text-gray-600 dark:text-gray-300">No previous draws found yet.</p>;
   }
 
+  console.log("Draws fetched:", draws);
   return (
     <section className="w-full max-w-6xl mt-10 rounded-[32px] border border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-slate-950/80 p-6 shadow-2xl shadow-gray-400/10 backdrop-blur-xl">
       <div className="flex flex-col gap-2 mb-6">
@@ -108,7 +109,9 @@ const DrawHistory = () => {
       <div className="space-y-4">
         {draws.map((draw) => {
           const drawLabel = `${String(draw.type || "").charAt(0).toUpperCase()}${String(draw.type || "").slice(1)} Draw`;
-          const drawYear = draw.year || new Date(draw.createdAt).getFullYear();
+          const drawNumber = draw.drawNo || draw.id;
+          const drawYearFrom = draw.yearFrom ?? draw.year;
+          const drawYearTo = draw.yearTo ?? draw.year;
           const drawDate = new Date(draw.createdAt).toLocaleString();
 
           return (
@@ -123,7 +126,7 @@ const DrawHistory = () => {
                       {drawLabel}
                     </h3>
                     <span className="rounded-full bg-blue-50 text-blue-700 px-3 py-1 text-xs font-medium dark:bg-blue-900/80 dark:text-blue-200">
-                      Year {drawYear}
+                      Draw No. {drawNumber} • {drawYearFrom}-{drawYearTo}
                     </span>
                   </div>
 
@@ -139,7 +142,8 @@ const DrawHistory = () => {
                   <DownloadPDFReport
                     results={getReportRows(draw.results || [])}
                     drawType={draw.type}
-                    drawNumber={draw.id}
+                    drawNumber={drawNumber}
+                    drawConfig={{ yearFrom: drawYearFrom, yearTo: drawYearTo }}
                     buttonLabel="📄 PDF"
                     className="w-full sm:w-auto cursor-pointer bg-green-700 hover:bg-green-800 text-white font-semibold px-4 py-2 rounded shadow-sm text-sm"
                   />

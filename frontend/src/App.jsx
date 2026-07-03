@@ -60,6 +60,12 @@ function App() {
     setScreen("drawing");
   };
 
+  const handleLogoClick = () => {
+    if (screen !== "drawing") {
+      setScreen("selection");
+    }
+  };
+
   const handleFullScreen = () => {
     if (document.documentElement.requestFullscreen) {
       document.documentElement.requestFullscreen();
@@ -84,7 +90,8 @@ function App() {
           <img
             src={ogdclLogo}
             alt="OGDCL Logo"
-            className={`${screen === "drawing" ? " w-20 md:w-40 " : " w-40 md:w-96 "} ${screen === "welcome" ? " pt-16 ": ""} print:mb-2 mb-4`}
+            onClick={handleLogoClick}
+            className={`${screen !== "drawing" ? "cursor-pointer hover:opacity-90" : ""} ${screen === "drawing" ? " w-20 md:w-40 " : " w-40 md:w-96 "} ${screen === "welcome" ? " pt-16 ": ""} print:mb-2 mb-4`}
           />
 
           <h1 className={`flex-1 text-right font-extrabold mb-4 print:text-3xl drop-shadow-lg ${screen === "drawing" ? " text-3xl " : " text-7xl "} ${screen === "welcome" ? " hidden ": ""}`}>
@@ -259,6 +266,7 @@ function App() {
                 results={results}
                 drawType={drawType}
                 drawNumber={drawConfigs[drawType].drawNumber}
+                drawConfig={drawConfigs[drawType]}
                 className="inline-flex items-center justify-center gap-2 rounded-2xl border cursor-pointer border-emerald-600 bg-emerald-700 px-8 py-3.5 text-base font-semibold text-white shadow-[0_16px_40px_rgba(5,150,105,0.25)] transition hover:-translate-y-0.5 hover:bg-emerald-800 focus:outline-none focus:ring-4 focus:ring-emerald-300 md:text-lg"
               />
             </div>

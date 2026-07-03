@@ -1,9 +1,20 @@
 // models/draw_type.js
 module.exports = (sequelize, DataTypes) => {
   const DrawType = sequelize.define('DrawType', {
-    year: {
+    yearFrom: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      field: 'year_from',
+    },
+    yearTo: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: 'year_to',
+    },
+    drawNo: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      field: 'draw_no',
     },
     type: {
       type: DataTypes.ENUM('hajj', 'umrah'),

@@ -45,6 +45,9 @@ const LuckyDraw = ({ drawType, config, onComplete }) => {
         winners: config.winners,
         waiting: config.waiting,
         year: config.drawYear,
+        yearFrom: config.yearFrom,
+        yearTo: config.yearTo,
+        drawNo: config.drawNumber,
       });
 
       console.log(response);

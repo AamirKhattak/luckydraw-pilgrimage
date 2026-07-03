@@ -10,7 +10,7 @@ const generateRandomNumber = () =>
   Math.floor(100000 + Math.random() * 400000).toString();
 
 exports.runDraw = async (req, res) => {
-  const { drawType, winners, waiting, year } = req.body;
+  const { drawType, winners, waiting, yearFrom, yearTo, year, drawNo } = req.body;
 
   if (!drawType || !winners || !waiting || !year) {
     return res.status(400).json({ error: "Missing required fields." });
@@ -30,6 +30,9 @@ exports.runDraw = async (req, res) => {
     const drawEntry = await DrawType.create({
       type: drawType,
       year,
+      yearFrom,
+      yearTo,
+      drawNo,
       winners,
       waiting,
     });
@@ -128,7 +131,10 @@ exports.getAllDraws = async (req, res) => {
 
     const formattedDraws = draws.map((draw) => ({
       id: draw.id,
+      drawNo: draw.drawNo,
       year: draw.year,
+      yearFrom: draw.yearFrom,
+      yearTo: draw.yearTo,
       type: draw.type,
       winners: draw.winners,
       waiting: draw.waiting,
