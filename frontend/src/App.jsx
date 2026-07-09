@@ -90,7 +90,14 @@ function App() {
   }, [results]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-blue-50 dark:bg-gradient-to-br dark:from-black dark:via-gray-800 dark:to-black text-black dark:text-white transition-colors duration-300 print:bg-white print:text-black">
+    <div
+      className="flex flex-col min-h-screen text-black dark:text-white transition-colors duration-300 print:bg-white print:text-black"
+      style={{
+        backgroundImage: `url('/background.png')`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
       <main className="flex-grow p-2  flex flex-col items-center justify-start">
         <div
           className={`w-full flex items-center mb-12 mt-2 print:mb-4 ${screen === "drawing" ? "justify-between" : "justify-center"} ${screen === "drawing" ? "flex-row" : "flex-col"}`}

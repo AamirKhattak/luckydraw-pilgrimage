@@ -17,15 +17,15 @@ exports.runDraw = async (req, res) => {
   }
 
   try {
-    // const existingDraw = await DrawType.findOne({
-    //   where: { type: drawType, year },
-    // });
+    const existingDraw = await DrawType.findOne({
+      where: { type: drawType, yearFrom: yearFrom, yearTo: yearTo, drawNo: drawNo },
+    });
 
-    // if (existingDraw) {
-    //   return res.status(400).json({
-    //     error: `A '${drawType}' draw for year ${year} has already been conducted.`,
-    //   });
-    // }
+    if (existingDraw) {
+      return res.status(400).json({
+        error: `A '${drawType}' draw for year ${year} has already been conducted.`,
+      });
+    }
 
     const drawEntry = await DrawType.create({
       type: drawType,

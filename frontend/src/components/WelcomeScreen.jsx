@@ -15,7 +15,7 @@ const WelcomeScreen = ({ onProceed }) => {
       </h1>
 
       <h2 className="text-4xl md:text-5xl font-bold text-green-700 dark:text-green-400 mb-4">
-        Annual Hajj & Umrah Draw <br/> For the year 2027
+        Annual Hajj & Umrah Draw <br/> For the year 2026-27
       </h2>
 
       <p className="text-xl mt-5 md:text-2xl max-w-3xl text-gray-700 dark:text-gray-300 mb-6 italic">
